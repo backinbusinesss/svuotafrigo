@@ -1,0 +1,114 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/inter";
+@import "@fontsource/caveat/600.css";
+
+/* ——— Design tokens SvuotaFrigo ——— */
+@theme {
+  --font-display: "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --font-hand: "Caveat", cursive;
+
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-tomato: var(--tomato);
+  --color-tomato-ink: var(--tomato-ink);
+  --color-tomato-soft: var(--tomato-soft);
+  --color-basil: var(--basil);
+  --color-basil-soft: var(--basil-soft);
+  --color-butter: var(--butter);
+  --color-butter-soft: var(--butter-soft);
+  --color-plum: var(--plum);
+
+  --radius-xl2: 1.25rem;
+  --radius-xl3: 1.75rem;
+  --ease-spring: cubic-bezier(.2, .9, .25, 1.15);
+}
+
+:root {
+  --paper: #fff8ef;
+  --paper-2: #fbefdf;
+  --card: #ffffff;
+  --ink: #1d1a16;
+  --muted: #6f675e;
+  --faint: #a2988c;
+  --line: #ecdfcd;
+  --tomato: #e8442e;
+  --tomato-ink: #c2321e;
+  --tomato-soft: #fde4dd;
+  --basil: #2f7d4f;
+  --basil-soft: #dcf0e1;
+  --butter: #ffc94a;
+  --butter-soft: #fff1c9;
+  --plum: #6c3fd1;
+  --shadow-card: 0 1px 0 rgba(29, 26, 22, .04), 0 10px 30px -18px rgba(90, 60, 20, .35);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --paper: #15120f;
+  --paper-2: #1c1814;
+  --card: #221d18;
+  --ink: #f7efe5;
+  --muted: #b5a998;
+  --faint: #7d7266;
+  --line: #342c25;
+  --tomato: #ff6a52;
+  --tomato-ink: #ff8a76;
+  --tomato-soft: #3d1f19;
+  --basil: #5fc58a;
+  --basil-soft: #173326;
+  --butter: #ffd166;
+  --butter-soft: #3a2f14;
+  --plum: #a98bff;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, .03), 0 14px 30px -18px rgba(0, 0, 0, .8);
+  color-scheme: dark;
+}
+
+html { -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.03em; }
+::selection { background: var(--butter); color: #1d1a16; }
+:focus-visible { outline: 2.5px solid var(--tomato); outline-offset: 2px; border-radius: 10px; }
+button { cursor: pointer; }
+
+@utility card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+@utility press {
+  transition: transform .18s var(--ease-spring), filter .2s;
+  &:active { transform: scale(.96); }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* Magnete del frigo (usato per badge e titoli scritti a mano) */
+@utility magnet {
+  font-family: var(--font-hand);
+  transform: rotate(-3deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+@keyframes marquee { to { transform: translateX(-50%); } }

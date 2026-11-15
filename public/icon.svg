@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb547"/>
+      <stop offset="1" stop-color="#e8442e"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <!-- frigo -->
+  <rect x="146" y="92" width="220" height="328" rx="44" fill="#fff8ef"/>
+  <rect x="146" y="214" width="220" height="10" fill="#e8442e" opacity=".25"/>
+  <rect x="320" y="128" width="14" height="58" rx="7" fill="#1d1a16" opacity=".75"/>
+  <rect x="320" y="252" width="14" height="86" rx="7" fill="#1d1a16" opacity=".75"/>
+  <!-- foglia di basilico -->
+  <path d="M210 330c0-62 46-100 104-100-4 64-44 104-104 100z" fill="#2f7d4f"/>
+  <path d="M214 326c22-28 50-52 88-78" stroke="#dcf0e1" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <!-- magnete a cuore -->
+  <circle cx="196" cy="150" r="20" fill="#ffc94a"/>
+</svg>

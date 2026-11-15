@@ -1,0 +1,23 @@
+{
+  "name": "SvuotaFrigo",
+  "short_name": "SvuotaFrigo",
+  "description": "Quello che hai in frigo diventa cena.",
+  "lang": "it",
+  "start_url": "./app/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff8ef",
+  "theme_color": "#e8442e",
+  "categories": ["food", "lifestyle", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Ricette", "url": "./app/#/ricette" },
+    { "name": "Lista della spesa", "url": "./app/#/spesa" }
+  ]
+}

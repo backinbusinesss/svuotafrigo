@@ -1,0 +1,10 @@
+name = "svuotafrigo-vision"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Origini che possono chiamare il worker (separate da virgola)
+ALLOWED_ORIGIN = "https://backinbusinesss.github.io,http://localhost:5173"
+
+# La chiave NON va qui: wrangler secret put ANTHROPIC_API_KEY

@@ -112,3 +112,12 @@ button { cursor: pointer; }
 }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Note legali (privacy.html, cookie.html, termini.html) */
+.legal h2 { margin: 2rem 0 0.5rem; font-family: var(--font-display, inherit); font-size: 1.25rem; font-weight: 700; }
+.legal p, .legal li { line-height: 1.65; color: var(--ink); }
+.legal p + p { margin-top: 0.75rem; }
+.legal ul { margin: 0.5rem 0; padding-left: 1.25rem; list-style: disc; }
+.legal li { margin: 0.4rem 0; }
+.legal article a { color: var(--tomato-ink); text-decoration: underline; text-underline-offset: 3px; }
+.legal code { font-size: 0.9em; background: var(--paper-2); padding: 0.1em 0.35em; border-radius: 6px; }

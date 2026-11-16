@@ -1,4 +1,5 @@
 // Sito di presentazione: tutto porta a "Apri l'app gratis".
+import { LegalLinks } from './Legal'
 import { ArrowRight, BarChart3, Bell, BookOpen, CalendarDays, Camera, Check, ChefHat, Clock, ShoppingBasket, Sparkles, Timer, WifiOff } from 'lucide-react'
 import { motion } from 'motion/react'
 import { type ReactNode, useEffect } from 'react'
@@ -276,6 +277,10 @@ export function Site() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5">
           <span className="flex items-center gap-2"><img src="./icon.svg" alt="" className="h-6 w-6" /> SvuotaFrigo © {new Date().getFullYear()}</span>
           <span>Un'app <a className="font-semibold text-ink underline" href="https://backinbusinesss.github.io/carlarcade/" target="_blank" rel="noopener">CarlArcade</a> by <a className="font-semibold text-ink underline" href="https://carlhost.com" target="_blank" rel="noopener">Carlhost</a></span>
+          <div className="flex w-full flex-wrap justify-between gap-3 border-t border-line pt-4 text-xs">
+            <span>CarlHost di Ulivi Nicolò · Via Ventisette Novembre 1, Parabiago (MI) · P.IVA IT14943820960</span>
+            <LegalLinks />
+          </div>
         </div>
       </footer>
     </div>

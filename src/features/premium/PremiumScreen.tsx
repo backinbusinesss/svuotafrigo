@@ -107,7 +107,7 @@ export function PremiumScreen({ from }: { from?: string }) {
         <Button size="lg" block onClick={buy}>{trialAvailable ? `Prova gratis per ${TRIAL_DAYS} giorni` : 'Attiva Premium'}</Button>
       </div>
       <p className="mt-2 text-center text-xs text-muted">
-        {trialAvailable ? `Poi ${plan === 'premium-year' ? `${euro(year.priceCents)}/anno` : `${euro(month.priceCents)}/mese`}. ` : ''}Disdici quando vuoi dal profilo.
+        {trialAvailable ? `Poi ${plan === 'premium-year' ? `${euro(year.priceCents)}/anno` : `${euro(month.priceCents)}/mese`}. ` : ''}Rinnovo automatico, disdici quando vuoi dal profilo.
       </p>
 
       {/* ——— Pacchetti ——— */}
@@ -127,6 +127,13 @@ export function PremiumScreen({ from }: { from?: string }) {
           )
         })}
       </div>
+
+      <p className="mt-6 text-center text-xs leading-relaxed text-faint">
+        Pagamento sicuro con Stripe. Acquistando accetti i{' '}
+        <a className="underline" href="../termini.html" target="_blank" rel="noopener">Termini e condizioni di vendita</a> e
+        confermi di aver letto l'<a className="underline" href="../privacy.html" target="_blank" rel="noopener">Informativa privacy</a>.
+        Hai 14 giorni per chiedere il rimborso completo.
+      </p>
     </div>
   )
 }

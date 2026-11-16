@@ -1,4 +1,5 @@
 // Profilo: impatto, traguardi, preferenze alimentari, tema, abbonamento, dati.
+import { LegalLinks } from '@/site/Legal'
 import { Bell, ChevronRight, Moon, Sparkles, Sun, SunMoon, Trash2 } from 'lucide-react'
 import { useMemo } from 'react'
 import { addDays } from '@/domain/dates'
@@ -167,7 +168,8 @@ export function ProfileScreen() {
           <Trash2 size={15} /> Cancella tutti i dati
         </Button>
       </div>
-      <p className="mt-8 text-center text-xs text-faint">SvuotaFrigo · un'app <a className="underline" href="https://backinbusinesss.github.io/carlarcade/" target="_blank" rel="noopener">CarlArcade</a> by Carlhost</p>
+      <LegalLinks base="../" className="mt-8 justify-center text-xs text-muted [&>a]:underline" />
+      <p className="mt-3 text-center text-xs text-faint">SvuotaFrigo · un'app <a className="underline" href="https://backinbusinesss.github.io/carlarcade/" target="_blank" rel="noopener">CarlArcade</a> by Carlhost</p>
     </div>
   )
 }

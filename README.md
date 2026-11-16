@@ -4,6 +4,7 @@
 
 - **Sito:** `/` — presentazione, prezzi, FAQ
 - **App (PWA installabile, funziona offline):** `/app/`
+- **Note legali:** `/privacy.html`, `/cookie.html`, `/termini.html` (testi in [`src/site/Legal.tsx`](src/site/Legal.tsx), prezzi presi da `plans.ts`)
 
 ## Cosa fa
 

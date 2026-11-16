@@ -5,6 +5,12 @@ import { r } from './recipe-dsl'
 import { DOLCI_EXTRA } from './recipes-dolci'
 import { PRIMI_EXTRA } from './recipes-primi'
 import { SECONDI_EXTRA } from './recipes-secondi'
+import { FREE_ALTRO } from './recipes-free-altro'
+import { FREE_EXTRA } from './recipes-free-extra'
+import { PACKS_1 } from './packs-1'
+import { PACKS_2 } from './packs-2'
+import { FREE_PRIMI } from './recipes-free-primi'
+import { FREE_SECONDI } from './recipes-free-secondi'
 
 export const RECIPES: Recipe[] = [
   // ════════════ PRIMI ════════════
@@ -280,6 +286,12 @@ export const RECIPES: Recipe[] = [
   ...PRIMI_EXTRA,
   ...SECONDI_EXTRA,
   ...DOLCI_EXTRA,
+  ...FREE_PRIMI,
+  ...FREE_SECONDI,
+  ...FREE_ALTRO,
+  ...FREE_EXTRA,
+  ...PACKS_1,
+  ...PACKS_2,
 ]
 
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((x) => [x.id, x]))

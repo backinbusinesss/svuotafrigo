@@ -86,7 +86,7 @@ export interface Recipe {
   pack?: PackId
 }
 
-export type PackId = 'dolci' | 'regionali' | 'fit'
+export type PackId = 'dolci' | 'regionali' | 'fit' | 'mare' | 'verde' | 'veloci' | 'mondo' | 'street' | 'feste' | 'bimbi' | 'settimana' | 'forno'
 
 /** Un ingrediente presente in casa. */
 export interface PantryItem {

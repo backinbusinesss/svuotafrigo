@@ -187,7 +187,7 @@ export function Site() {
               <Timer size={28} className="text-butter" />
               <div>
                 <div className="font-display text-5xl font-extrabold">{FREE_COUNT}</div>
-                <div className="text-paper/70">ricette gratis, più 3 pacchetti speciali</div>
+                <div className="text-paper/70">ricette gratis, più {Object.keys(PACKS).length} pacchetti speciali</div>
               </div>
             </Reveal>
           </div>

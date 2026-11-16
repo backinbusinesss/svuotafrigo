@@ -1,6 +1,6 @@
 // Aggiunta ingredienti: ricerca istantanea + scorciatoie per corsia.
-import { Check, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Check, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { AISLE_LABELS, INGREDIENTS } from '@/content/ingredients'
 import { searchIngredients } from '@/domain/pantry'
@@ -58,13 +58,13 @@ export function AddSheet({ open, onClose, mode = 'pantry' }: { open: boolean; on
       </label>
 
       {!q.trim() && (
-        <div className="no-scrollbar -mx-5 mb-3 flex gap-2 overflow-x-auto px-5">
+        <ChipRow>
           {(Object.keys(AISLE_LABELS) as Aisle[]).filter((a) => a !== 'spezie').map((a) => (
-            <button key={a} onClick={() => setAisle(a)} className={cx('press shrink-0 rounded-full border px-3.5 py-2 text-sm font-medium', aisle === a ? 'border-ink bg-ink text-paper' : 'border-line bg-card')}>
+            <button key={a} data-active={aisle === a || undefined} onClick={(e) => { setAisle(a); e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }) }} className={cx('press shrink-0 rounded-full border px-3.5 py-2 text-sm font-medium', aisle === a ? 'border-ink bg-ink text-paper' : 'border-line bg-card')}>
               {AISLE_LABELS[a].emoji} {AISLE_LABELS[a].label}
             </button>
           ))}
-        </div>
+        </ChipRow>
       )}
 
       <div className="grid grid-cols-3 gap-2 pb-24 sm:grid-cols-4">
@@ -93,5 +93,49 @@ export function AddSheet({ open, onClose, mode = 'pantry' }: { open: boolean; on
         </Button>
       </div>
     </Sheet>
+  )
+}
+
+/** Riga di categorie scorrevole, con frecce ai lati quando c'è altro da vedere. */
+function ChipRow({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [edges, setEdges] = useState({ left: false, right: false })
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const update = () => setEdges({ left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 })
+    update()
+    el.querySelector('[data-active]')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+    el.addEventListener('scroll', update, { passive: true })
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => { el.removeEventListener('scroll', update); ro.disconnect() }
+  }, [])
+
+  const move = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.7, behavior: 'smooth' })
+
+  const arrow = (dir: 1 | -1) => (
+    <div className={cx('pointer-events-none absolute inset-y-0 z-10 flex items-center transition-opacity', dir < 0 ? '-left-5 bg-gradient-to-r pl-3 pr-6' : '-right-5 justify-end bg-gradient-to-l pl-6 pr-3', 'from-paper via-paper/90 to-transparent', (dir < 0 ? edges.left : edges.right) ? 'opacity-100' : 'opacity-0')}>
+      <button
+        type="button"
+        aria-label={dir < 0 ? 'Categorie precedenti' : 'Altre categorie'}
+        tabIndex={(dir < 0 ? edges.left : edges.right) ? 0 : -1}
+        onClick={() => move(dir)}
+        className="press pointer-events-auto grid h-9 w-9 place-items-center rounded-full border border-line bg-card shadow-sm"
+      >
+        {dir < 0 ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+      </button>
+    </div>
+  )
+
+  return (
+    <div className="relative mb-3">
+      {arrow(-1)}
+      <div ref={ref} className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto scroll-smooth px-5">
+        {children}
+      </div>
+      {arrow(1)}
+    </div>
   )
 }

@@ -68,7 +68,7 @@ npm run build      # typecheck + build in dist/
 
 ```
 src/
-├── content/        115 ingredienti e 85 ricette, con un mini-linguaggio compatto
+├── content/        256 ingredienti e 85 ricette, con un mini-linguaggio compatto
 ├── domain/         logica pura e testata: scadenze, abbinamento, piano, impatto, prezzi
 ├── store/          stato persistente (localStorage) con zustand
 ├── providers/      worker API, pagamenti (Stripe o demo), riconoscimento foto (Claude o demo)

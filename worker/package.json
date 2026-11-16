@@ -1,8 +1,8 @@
 {
-  "name": "svuotafrigo-vision",
+  "name": "svuotafrigo-api",
   "private": true,
   "type": "module",
-  "description": "Riconoscimento foto del frigo per SvuotaFrigo (Cloudflare Worker + Claude)",
+  "description": "API di SvuotaFrigo: foto del frigo con Claude e pagamenti Stripe (Cloudflare Worker)",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",

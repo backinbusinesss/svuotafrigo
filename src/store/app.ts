@@ -15,9 +15,14 @@ export type Theme = 'system' | 'light' | 'dark'
 
 export interface Subscription {
   plan: PlanId
-  /** ISO date di fine prova, se in prova */
+  /** ISO date di fine prova, se in prova (resta salvata: la prova vale una volta) */
   trialEndsAt?: string
   renewsAt?: string
+  /** disdetto: resta attivo fino a renewsAt */
+  cancelAtPeriodEnd?: boolean
+  /** riferimenti Stripe, per rileggere lo stato e aprire il portale clienti */
+  stripeSubscriptionId?: string
+  stripeCustomerId?: string
 }
 
 interface State {
@@ -57,6 +62,7 @@ interface Actions {
   markPlanDone(date: string): void
   activatePlan(plan: PlanId, withTrial: boolean): void
   cancelPlan(): void
+  setSubscription(sub: Subscription): void
   buyPack(pack: PackId): void
   consumeScan(): void
   resetAll(): void
@@ -189,7 +195,10 @@ export const useApp = create<State & Actions>()(
         })
       },
 
-      cancelPlan: () => set({ subscription: { plan: 'free' } }),
+      // la data di fine prova resta: la prova gratuita non si ripete
+      cancelPlan: () => set({ subscription: { plan: 'free', trialEndsAt: get().subscription.trialEndsAt } }),
+
+      setSubscription: (subscription) => set({ subscription }),
 
       buyPack: (pack) => set({ packs: [...new Set([...get().packs, pack])] }),
 

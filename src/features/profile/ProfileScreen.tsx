@@ -141,8 +141,15 @@ export function ProfileScreen() {
         {premium ? (
           <>
             <div className="font-semibold">{PLANS[s.subscription.plan].name}</div>
-            <div className="text-sm text-muted">{s.subscription.renewsAt ? `Rinnovo il ${new Date(s.subscription.renewsAt).toLocaleDateString('it-IT')}` : ''}</div>
-            <Button variant="ghost" size="sm" className="mt-3" onClick={async () => { if (confirm('Disdire Premium?')) { await cancelSubscription(); toast('Abbonamento disdetto', '👋') } }}>Disdici</Button>
+            <div className="text-sm text-muted">
+              {s.subscription.renewsAt
+                ? `${s.subscription.cancelAtPeriodEnd ? 'Disdetto: attivo fino al' : s.subscription.trialEndsAt === s.subscription.renewsAt ? 'Prova gratuita fino al' : 'Rinnovo il'} ${new Date(s.subscription.renewsAt).toLocaleDateString('it-IT')}`
+                : ''}
+            </div>
+            <Button variant="ghost" size="sm" className="mt-3" onClick={async () => {
+              if (s.subscription.stripeCustomerId) { await cancelSubscription(); return }
+              if (confirm('Disdire Premium?')) { await cancelSubscription(); toast('Abbonamento disdetto', '👋') }
+            }}>{s.subscription.stripeCustomerId ? 'Gestisci o disdici' : 'Disdici'}</Button>
           </>
         ) : (
           <a href={href({ name: 'premium' })} className="press flex items-center justify-between">

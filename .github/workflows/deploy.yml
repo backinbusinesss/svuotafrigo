@@ -28,8 +28,8 @@ jobs:
       - run: npm test
       - run: npm run build
         env:
-          # URL del worker di scansione foto; se manca, l'app usa la modalità dimostrativa
-          VITE_VISION_URL: ${{ secrets.VITE_VISION_URL }}
+          # URL del worker (foto + pagamenti); se manca, l'app usa la modalità dimostrativa
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
         with:

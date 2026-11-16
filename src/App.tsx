@@ -15,7 +15,10 @@ import { ProfileScreen } from '@/features/profile/ProfileScreen'
 import { RecipeScreen } from '@/features/recipes/RecipeScreen'
 import { RecipesScreen } from '@/features/recipes/RecipesScreen'
 import { ShoppingScreen } from '@/features/shopping/ShoppingScreen'
-import { useToasts } from '@/lib/feedback'
+import { toast, useToasts } from '@/lib/feedback'
+import { handleCheckoutReturn, refreshSubscription } from '@/providers/payments'
+import { PACKS } from '@/domain/plans'
+import type { PackId } from '@/domain/types'
 import { href, type Route, useRoute } from '@/lib/router'
 import { isPremium, useApp } from '@/store/app'
 import { cx } from '@/ui/kit'
@@ -33,6 +36,19 @@ function useTheme() {
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
   }, [theme])
+}
+
+/** All'avvio: conferma un pagamento appena fatto su Stripe e aggiorna lo stato dell'abbonamento. */
+function usePayments() {
+  useEffect(() => {
+    handleCheckoutReturn()
+      .then((product) => {
+        if (!product) return refreshSubscription()
+        const [kind, id] = product.split(':')
+        toast(kind === 'pack' ? `Pacchetto ${PACKS[id as PackId]?.name ?? ''} sbloccato. Grazie!` : 'Premium attivo. Grazie!', '★')
+      })
+      .catch(() => toast('Pagamento non ancora confermato. Riapri l’app tra poco: se hai pagato, si attiverà da solo.', '⚠️'))
+  }, [])
 }
 
 /** Avviso all'apertura (Premium): cosa scade oggi o domani. */
@@ -114,6 +130,7 @@ function Screen({ route }: { route: Route }) {
 export function App() {
   useTheme()
   useExpiryAlert()
+  usePayments()
   const onboarded = useApp((s) => s.onboarded)
   const route = useRoute()
 

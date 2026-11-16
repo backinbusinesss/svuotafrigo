@@ -26,27 +26,31 @@ Definito in [`src/domain/plans.ts`](src/domain/plans.ts) (unica fonte dei prezzi
 - **Pacchetti singoli** a vita: Dolci 1,99 €, Giro d'Italia 2,99 €, Fit 1,99 €
 - Paywall nei momenti giusti: scansione foto, piano, porzioni oltre 4, statistiche, ricette dei pacchetti (visibili col lucchetto)
 
-### Collegare i pagamenti veri
+### Pagamenti veri (Stripe) e scansione foto (Claude)
 
-Oggi i pagamenti sono **dimostrativi** (nessun addebito, nessun dato carta). Tutto passa da [`src/providers/payments.ts`](src/providers/payments.ts): sostituisci `demoGateway` con un gateway Stripe. Il commento in cima al file spiega i 4 passi (Checkout Session `subscription` con `trial_period_days: 7` per Premium, `payment` per i pacchetti, webhook che salva l'acquisto). Se l'app finirà negli store, gli acquisti digitali devono passare da Google Play / App Store (es. con RevenueCat): cambia il gateway, non le schermate.
+Tutto passa dal worker già online: **https://svuotafrigo-api.ulivinic.workers.dev** (cartella [`worker/`](worker/), Cloudflare).
+L'app chiede `/config` all'avvio e usa le funzioni reali **solo se il worker ha le chiavi**; altrimenti resta in modalità dimostrativa e lo dice all'utente. Oggi: `{"vision":false,"payments":false}`.
 
-> Con i pagamenti veri servirà anche un account utente (per ritrovare gli acquisti su altri dispositivi). Oggi tutti i dati restano nel browser.
-
-### Collegare la scansione foto
-
-Il riconoscimento usa **Claude** tramite un piccolo server ([`worker/`](worker/)) che tiene la chiave API al sicuro:
+Per attivarle bastano le chiavi (una volta sola, dalla cartella `worker`):
 
 ```bash
-cd worker
-npm install
-npx wrangler login
-npx wrangler secret put ANTHROPIC_API_KEY
-npx wrangler deploy
+npx wrangler secret put STRIPE_SECRET_KEY     # sk_test_… per provare, sk_live_… per incassare
+npx wrangler secret put ANTHROPIC_API_KEY     # per la scansione foto
 ```
 
-Poi crea `.env` nella cartella principale con `VITE_VISION_URL=https://svuotafrigo-vision.<tuo-account>.workers.dev` (o il segreto `VITE_VISION_URL` nel repository GitHub per il deploy) e ricompila. Senza URL l'app mostra un risultato d'esempio, segnalato come dimostrativo.
+Non serve ricompilare l'app né creare prodotti in Stripe: importi e nomi arrivano da `src/domain/plans.ts`.
+Per la disdetta dal profilo attiva il **portale clienti** in Stripe (Impostazioni → Billing → Portale clienti).
 
-Il worker usa il modello `claude-opus-5-5` con output strutturato (solo id del catalogo), effort `low` e fallback automatico se la richiesta viene rifiutata. Aggiorna `ALLOWED_ORIGIN` in `worker/wrangler.toml` con il dominio dell'app.
+Come funziona ([`src/providers/payments.ts`](src/providers/payments.ts), [`worker/src/stripe.ts`](worker/src/stripe.ts)):
+1. `/checkout` crea una sessione Stripe Checkout (abbonamento con 7 giorni di prova, oppure pagamento singolo per i pacchetti)
+2. l'utente paga sulla pagina sicura di Stripe e torna su `/app/?checkout=ok&session_id=…`
+3. `/verify` conferma il pagamento lato server e l'app attiva Premium o il pacchetto
+4. a ogni avvio `/entitlement` rilegge lo stato dell'abbonamento (rinnovo, disdetta, fine prova)
+
+> Limite attuale: gli acquisti sono legati al dispositivo (nessun account). Per ritrovarli su un altro telefono servirà un login.
+> Se l'app finirà negli store, gli acquisti digitali devono passare da Google Play / App Store.
+
+La scansione usa `claude-opus-5-5` con output strutturato (solo id del catalogo), effort `low` e fallback automatico se la richiesta viene rifiutata.
 
 ## Sviluppo
 
@@ -55,7 +59,7 @@ Serve Node.js 20+.
 ```bash
 npm install
 npm run dev        # http://localhost:5173 (sito) e /app/
-npm test           # 28 test: catalogo, abbinamento, piano, impatto, store
+npm test           # 32 test: catalogo, abbinamento, piano, impatto, store, pagamenti
 npm run build      # typecheck + build in dist/
 ```
 
@@ -66,12 +70,12 @@ src/
 ├── content/        115 ingredienti e 85 ricette, con un mini-linguaggio compatto
 ├── domain/         logica pura e testata: scadenze, abbinamento, piano, impatto, prezzi
 ├── store/          stato persistente (localStorage) con zustand
-├── providers/      prese: pagamenti (demo/Stripe), riconoscimento foto (demo/worker)
+├── providers/      worker API, pagamenti (Stripe o demo), riconoscimento foto (Claude o demo)
 ├── features/       schermate: fridge, recipes, plan, shopping, profile, premium, onboarding
 ├── ui/             componenti condivisi
 ├── site/           sito di presentazione
 └── styles/         Tailwind 4 + token di design (chiaro e scuro)
-worker/             Cloudflare Worker per la scansione foto (Claude)
+worker/             Cloudflare Worker: scansione foto (Claude) e pagamenti (Stripe)
 tests/              vitest
 ```
 

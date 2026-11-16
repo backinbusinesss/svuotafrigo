@@ -1,17 +1,21 @@
 /**
- * SvuotaFrigo — riconoscimento foto del frigo (Cloudflare Worker).
+ * SvuotaFrigo API (Cloudflare Worker): riconoscimento foto con Claude e pagamenti con Stripe.
  *
- * POST /scan  { image: "<base64 jpeg>", mediaType?: "image/jpeg" }
- *   → { items: [{ id, confidence }], unknown: [string] }
+ * GET  /config  → { vision: bool, payments: bool }  (l'app usa le funzioni reali solo se configurate)
+ * POST /scan    { image: "<base64 jpeg>", mediaType?: "image/jpeg" } → { items: [{ id, confidence }], unknown: [string] }
+ * POST /checkout, /verify, /entitlement, /portal  → vedi stripe.ts
  *
- * La chiave Anthropic resta qui, sul server: l'app non la vede mai.
- * Configurazione: `wrangler secret put ANTHROPIC_API_KEY` e ALLOWED_ORIGIN in wrangler.toml.
+ * Le chiavi restano qui, sul server: l'app non le vede mai.
+ *   wrangler secret put ANTHROPIC_API_KEY
+ *   wrangler secret put STRIPE_SECRET_KEY
  */
 import Anthropic from '@anthropic-ai/sdk'
 import { INGREDIENTS } from '../../src/content/ingredients'
+import { handleStripe, StripeError } from './stripe'
 
 interface Env {
-  ANTHROPIC_API_KEY: string
+  ANTHROPIC_API_KEY?: string
+  STRIPE_SECRET_KEY?: string
   /** origini ammesse, separate da virgola (es. "https://backinbusinesss.github.io,https://svuotafrigo.carlarcade.com") */
   ALLOWED_ORIGIN: string
 }
@@ -63,9 +67,10 @@ function CATALOG_IDS() {
 }
 
 const client = (env: Env) => new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
+const origins = (env: Env) => env.ALLOWED_ORIGIN.split(',').map((s) => s.trim())
 
 function cors(origin: string | null, env: Env): Record<string, string> {
-  const allowed = env.ALLOWED_ORIGIN.split(',').map((s) => s.trim())
+  const allowed = origins(env)
   const ok = origin && allowed.includes(origin)
   return {
     'Access-Control-Allow-Origin': ok ? origin : allowed[0],
@@ -83,7 +88,25 @@ export default {
     const h = cors(req.headers.get('Origin'), env)
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h })
     const url = new URL(req.url)
-    if (req.method !== 'POST' || url.pathname !== '/scan') return json({ error: 'not_found' }, 404, h)
+    if (req.method === 'GET' && url.pathname === '/config') {
+      return json({ vision: !!env.ANTHROPIC_API_KEY, payments: !!env.STRIPE_SECRET_KEY }, 200, h)
+    }
+    if (req.method !== 'POST') return json({ error: 'not_found' }, 404, h)
+
+    if (['/checkout', '/verify', '/entitlement', '/portal'].includes(url.pathname)) {
+      if (!env.STRIPE_SECRET_KEY) return json({ error: 'payments_not_configured' }, 503, h)
+      try {
+        const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
+        const r = await handleStripe(url.pathname, body, env.STRIPE_SECRET_KEY, origins(env))
+        return json(r.body, r.status, h)
+      } catch (err) {
+        if (err instanceof StripeError) return json({ error: 'stripe', message: err.message }, err.status >= 500 ? 502 : 400, h)
+        return json({ error: 'internal' }, 500, h)
+      }
+    }
+
+    if (url.pathname !== '/scan') return json({ error: 'not_found' }, 404, h)
+    if (!env.ANTHROPIC_API_KEY) return json({ error: 'vision_not_configured' }, 503, h)
 
     let body: { image?: string; mediaType?: string }
     try {

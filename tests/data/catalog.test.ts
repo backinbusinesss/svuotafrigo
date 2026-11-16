@@ -29,8 +29,8 @@ describe('ingredienti', () => {
 })
 
 describe('ricette', () => {
-  it('sono almeno 70 e hanno id unici', () => {
-    expect(RECIPES.length).toBeGreaterThanOrEqual(70)
+  it('sono almeno 250 e hanno id unici', () => {
+    expect(RECIPES.length).toBeGreaterThanOrEqual(250)
     const ids = RECIPES.map((r) => r.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
@@ -75,5 +75,16 @@ describe('mini-linguaggio delle ricette', () => {
   })
   it('rifiuta quantità scritte male', () => {
     expect(() => parseIngredients('pasta duecento')).toThrow()
+  })
+})
+
+describe('varianti', () => {
+  it('puntano a un ingrediente base esistente, e le ricette usano solo ingredienti base', () => {
+    for (const i of INGREDIENTS) {
+      if (!i.as) continue
+      expect(INGREDIENT_BY_ID[i.as], `${i.id} → ${i.as}`).toBeDefined()
+      expect(INGREDIENT_BY_ID[i.as].as, `${i.id} → ${i.as} è a sua volta una variante`).toBeUndefined()
+    }
+    for (const r of RECIPES) for (const x of r.ingredients) expect(INGREDIENT_BY_ID[x.id]?.as, `${r.id} usa la variante ${x.id}`).toBeUndefined()
   })
 })

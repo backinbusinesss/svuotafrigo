@@ -12,7 +12,7 @@
 |---|---|---|
 | **Frigo** | ingredienti con scadenza stimata, "da usare subito", ricette salva-spreco, impatto (€, kg, serie) | — |
 | **Aggiungi** | ricerca istantanea senza accenti, per corsia | **scansione foto** con Claude (1 prova gratis) |
-| **Ricette** | 63 ricette gratis + 22 nei pacchetti, tab Pronte / Quasi / Tutte / Preferite, filtri, ricerca | pacchetti Dolci, Giro d'Italia, Fit inclusi |
+| **Ricette** | 219 ricette gratis + 53 nei pacchetti, tab Pronte / Quasi / Tutte / Preferite, filtri, ricerca | pacchetti Dolci, Giro d'Italia, Fit inclusi |
 | **Ricetta** | cosa hai e cosa manca, porzioni fino a 4, "aggiungi mancanti alla spesa", "Fatta!" | porzioni fino a 12 |
 | **Cucina** | passo passo a schermo intero, timer con suono e vibrazione, schermo sempre acceso | — |
 | **Spesa** | per corsia, condivisione, "Ho fatto la spesa" sposta tutto in frigo | — |
@@ -68,7 +68,7 @@ npm run build      # typecheck + build in dist/
 
 ```
 src/
-├── content/        256 ingredienti e 85 ricette, con un mini-linguaggio compatto
+├── content/        592 ingredienti (194 varianti come rucola o spaghetti, che nelle ricette contano come l'ingrediente base) e 272 ricette, con un mini-linguaggio compatto
 ├── domain/         logica pura e testata: scadenze, abbinamento, piano, impatto, prezzi
 ├── store/          stato persistente (localStorage) con zustand
 ├── providers/      worker API, pagamenti (Stripe o demo), riconoscimento foto (Claude o demo)

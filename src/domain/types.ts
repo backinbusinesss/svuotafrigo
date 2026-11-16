@@ -33,6 +33,8 @@ export interface Ingredient {
   avgPrice: number
   /** peso medio in grammi di una confezione/unità tipica, per stimare i kg salvati */
   avgGrams: number
+  /** variante di un altro ingrediente: nelle ricette conta come quello (es. rucola → insalata) */
+  as?: string
   /** escluso da queste diete */
   notFor?: Diet[]
   /** allergeni contenuti */

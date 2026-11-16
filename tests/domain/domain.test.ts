@@ -48,15 +48,22 @@ describe('frigo', () => {
     expect(expiringSoon(items, TODAY).map((x) => x.ingredientId)).toEqual(['uova', 'latte'])
   })
   it('cerca senza accenti, per alias e per inizio parola', () => {
-    expect(searchIngredients('pomodorini')[0].id).toBe('pomodori')
+    expect(searchIngredients('pomodoro')[0].id).toBe('pomodori')
+    expect(searchIngredients('ciliegini')[0].id).toBe('pomodorini')
     expect(searchIngredients('caffe')[0].id).toBe('caffe')
     expect(searchIngredients('zucch')[0].id).toBe('zucchine')
-    expect(searchIngredients('grana')[0].id).toBe('parmigiano')
+    expect(searchIngredients('grana')[0].id).toBe('grana')
     expect(searchIngredients('')).toEqual([])
   })
 })
 
 describe('abbinamento ricette', () => {
+  it('le varianti contano come l’ingrediente base (spaghetti → pasta, guanciale → pancetta)', () => {
+    const pantry: PantryItem[] = ['spaghetti', 'guanciale', 'pecorino-romano', 'uova-bio'].map((id) => ({ ingredientId: id, addedAt: TODAY, expiresAt: addDays(TODAY, 2) }))
+    const m = matchRecipe(RECIPE_BY_ID.carbonara, pantry, TODAY, FREE)
+    expect(m.kind).toBe('pronta')
+    expect(m.rescues.length).toBeGreaterThan(0)
+  })
   it('la carbonara è pronta con uova, pancetta, pecorino e pasta (sale e pepe si danno per scontati)', () => {
     const m = matchRecipe(RECIPE_BY_ID.carbonara, fridge('pasta', 'uova', 'pancetta', 'pecorino'), TODAY, FREE)
     expect(m.kind).toBe('pronta')

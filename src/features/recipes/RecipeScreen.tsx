@@ -1,7 +1,7 @@
 // Dettaglio ricetta: cosa hai, cosa manca, porzioni, passi, "l'ho cucinata".
 import { Check, ChefHat, Clock, Flame, Heart, Lock, Minus, Plus, Share2, ShoppingCart, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { INGREDIENT_BY_ID } from '@/content/ingredients'
+import { INGREDIENT_BY_ID, recipeIdOf } from '@/content/ingredients'
 import { RECIPE_BY_ID } from '@/content/recipes'
 import { formatKg } from '@/domain/impact'
 import { matchRecipe, optionalConflicts, scaleQty } from '@/domain/matching'
@@ -45,7 +45,7 @@ export function RecipeScreen({ id }: { id: string }) {
     return <div className="pt-20 text-center"><p>Ricetta non trovata.</p><a className="text-tomato" href={href({ name: 'ricette' })}>Torna alle ricette</a></div>
   }
   const conflicts = optionalConflicts(recipe, { diets, allergies })
-  const inFridge = new Set(pantry.map((p) => p.ingredientId))
+  const inFridge = new Set(pantry.flatMap((p) => [p.ingredientId, recipeIdOf(p.ingredientId)]))
   const maxServ = access.premium ? 12 : FREE_LIMITS.servings
 
   const setServ = (n: number) => {

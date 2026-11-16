@@ -1,6 +1,6 @@
 // Il cuore di SvuotaFrigo: quali ricette puoi fare con quello che hai,
 // dando la precedenza a ciò che sta per scadere.
-import { INGREDIENT_BY_ID } from '@/content/ingredients'
+import { INGREDIENT_BY_ID, recipeIdOf } from '@/content/ingredients'
 import { daysLeft } from './pantry'
 import type { Allergen, Diet, PackId, PantryItem, Recipe } from './types'
 
@@ -68,7 +68,14 @@ export const isLocked = (recipe: Recipe, access: Access) =>
   !!recipe.pack && !access.premium && !access.packs.includes(recipe.pack)
 
 export function matchRecipe(recipe: Recipe, pantry: PantryItem[], today: string, access: Access): RecipeMatch {
-  const inFridge = new Map(pantry.map((p) => [p.ingredientId, p]))
+  // le varianti (rucola, guanciale, spaghetti…) contano come l'ingrediente base; vale la scadenza più vicina
+  const inFridge = new Map<string, PantryItem>()
+  for (const p of pantry) {
+    for (const id of new Set([p.ingredientId, recipeIdOf(p.ingredientId)])) {
+      const cur = inFridge.get(id)
+      if (!cur || p.expiresAt < cur.expiresAt) inFridge.set(id, p)
+    }
+  }
   const req = requiredIds(recipe)
   const have = req.filter((id) => inFridge.has(id))
   const missing = req.filter((id) => !inFridge.has(id))

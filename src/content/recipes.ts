@@ -2,6 +2,9 @@
 // Le ricette con "pack" sono a pagamento (Premium o pacchetto singolo).
 import type { Recipe } from '@/domain/types'
 import { r } from './recipe-dsl'
+import { DOLCI_EXTRA } from './recipes-dolci'
+import { PRIMI_EXTRA } from './recipes-primi'
+import { SECONDI_EXTRA } from './recipes-secondi'
 
 export const RECIPES: Recipe[] = [
   // ════════════ PRIMI ════════════
@@ -274,6 +277,9 @@ export const RECIPES: Recipe[] = [
   r({ id: 'overnight-oats', name: 'Overnight oats', hook: 'La colazione si fa da sola mentre dormi.', course: 'colazione', min: 5, serv: 1, kcal: 380, emoji: '🥣🫐🌰', pack: 'fit', tags: ['vegetariano'],
     ing: 'avena 50g, yogurt 125g, latte 100ml, frutti-bosco 60g?, miele 1cucchiai?, noci 15g?',
     steps: ['Mescola avena, yogurt e latte in un barattolo.', 'Copri e lascia in frigo tutta la notte.', 'Al mattino aggiungi frutta, miele e noci.'] }),
+  ...PRIMI_EXTRA,
+  ...SECONDI_EXTRA,
+  ...DOLCI_EXTRA,
 ]
 
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((x) => [x.id, x]))

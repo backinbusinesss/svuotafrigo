@@ -1,7 +1,7 @@
 // Stato dell'app, salvato nel browser (localStorage). Nessun dato lascia il dispositivo.
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { INGREDIENT_BY_ID } from '@/content/ingredients'
+import { INGREDIENT_BY_ID, recipeIdOf } from '@/content/ingredients'
 import { RECIPE_BY_ID } from '@/content/recipes'
 import { addDays, todayISO, toISODate } from '@/domain/dates'
 import { rescueValue } from '@/domain/impact'
@@ -168,9 +168,9 @@ export const useApp = create<State & Actions>()(
         // Escono dal frigo solo i freschi deperibili (zucchine, latte, carne…) e ciò che
         // scadeva a breve. Uova, formaggi stagionati, pasta, cipolle di solito avanzano.
         const consumedByCooking = (p: PantryItem, day: string) =>
-          recipe.ingredients.some((x) => x.id === p.ingredientId) &&
+          recipe.ingredients.some((x) => x.id === recipeIdOf(p.ingredientId)) &&
           ((INGREDIENT_BY_ID[p.ingredientId]?.shelfDays ?? 99) <= 10 || p.expiresAt <= addDays(day, 3))
-        const usedItems = get().pantry.filter((p) => recipe.ingredients.some((x) => x.id === p.ingredientId))
+        const usedItems = get().pantry.filter((p) => recipe.ingredients.some((x) => x.id === recipeIdOf(p.ingredientId)))
         const { savedEuro, savedGrams } = rescueValue(usedItems, today)
         const entry: CookedEntry = { recipeId, at: nowLocal(), used: usedItems.map((p) => p.ingredientId), savedEuro, savedGrams }
         set({

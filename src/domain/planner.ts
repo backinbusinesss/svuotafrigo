@@ -1,6 +1,6 @@
 // Piano della settimana (Premium): sceglie le cene per usare prima ciò che scade,
 // variare i piatti e comprare il meno possibile.
-import { INGREDIENT_BY_ID } from '@/content/ingredients'
+import { INGREDIENT_BY_ID, recipeIdOf } from '@/content/ingredients'
 import { addDays, fromISODate } from './dates'
 import { type Access, fitsProfile, isLocked, matchRecipe, type Profile, requiredIds } from './matching'
 import type { MealPlanDay, PantryItem, Recipe, ShoppingItem } from './types'
@@ -65,7 +65,7 @@ export function planWeek({ recipes, pantry, profile, access, start, days = 7, av
     }
     // ciò che la ricetta usa esce dal frigo (gli ingredienti comprati si considerano consumati)
     const usedIds = new Set(m.have)
-    fridge = fridge.filter((p) => !usedIds.has(p.ingredientId))
+    fridge = fridge.filter((p) => !usedIds.has(p.ingredientId) && !usedIds.has(recipeIdOf(p.ingredientId)))
   }
 
   return {

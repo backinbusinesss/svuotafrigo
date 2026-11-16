@@ -9,6 +9,8 @@ import { FREE_ALTRO } from './recipes-free-altro'
 import { FREE_EXTRA } from './recipes-free-extra'
 import { PACKS_1 } from './packs-1'
 import { PACKS_2 } from './packs-2'
+import { PACKS_3 } from './packs-3'
+import { PACKS_4 } from './packs-4'
 import { FREE_PRIMI } from './recipes-free-primi'
 import { FREE_SECONDI } from './recipes-free-secondi'
 
@@ -292,6 +294,8 @@ export const RECIPES: Recipe[] = [
   ...FREE_EXTRA,
   ...PACKS_1,
   ...PACKS_2,
+  ...PACKS_3,
+  ...PACKS_4,
 ]
 
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((x) => [x.id, x]))

@@ -17,5 +17,8 @@ import { PACKS_13 } from './packs-13'
 import { PACKS_14 } from './packs-14'
 import { PACKS_15 } from './packs-15'
 import { PACKS_16 } from './packs-16'
+import { PACKS_17 } from './packs-17'
+import { PACKS_18 } from './packs-18'
+import { PACKS_19 } from './packs-19'
 
-export const PACK_RECIPES: Recipe[] = [...PACKS_1, ...PACKS_2, ...PACKS_3, ...PACKS_4, ...PACKS_5, ...PACKS_6, ...PACKS_7, ...PACKS_8, ...PACKS_9, ...PACKS_10, ...PACKS_11, ...PACKS_12, ...PACKS_13, ...PACKS_14, ...PACKS_15, ...PACKS_16]
+export const PACK_RECIPES: Recipe[] = [...PACKS_1, ...PACKS_2, ...PACKS_3, ...PACKS_4, ...PACKS_5, ...PACKS_6, ...PACKS_7, ...PACKS_8, ...PACKS_9, ...PACKS_10, ...PACKS_11, ...PACKS_12, ...PACKS_13, ...PACKS_14, ...PACKS_15, ...PACKS_16, ...PACKS_17, ...PACKS_18, ...PACKS_19]

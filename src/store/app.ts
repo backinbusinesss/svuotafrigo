@@ -8,8 +8,9 @@ import { rescueValue } from '@/domain/impact'
 import type { Access } from '@/domain/matching'
 import { newPantryItem } from '@/domain/pantry'
 import { mergeShopping } from '@/domain/planner'
+import { monthKey } from '@/domain/receipts'
 import { TRIAL_DAYS } from '@/domain/plans'
-import type { Allergen, CookedEntry, Diet, MealPlanDay, PackId, PantryItem, PlanId, ShoppingItem } from '@/domain/types'
+import type { Allergen, CookedEntry, Diet, MealPlanDay, PackId, PantryItem, PlanId, Receipt, ShoppingItem } from '@/domain/types'
 
 export type Theme = 'system' | 'light' | 'dark'
 
@@ -40,6 +41,10 @@ interface State {
   subscription: Subscription
   packs: PackId[]
   scansUsed: number
+  /** scontrini letti, i più recenti per primi (max 60) */
+  receipts: Receipt[]
+  /** quanti scontrini gratis usati nel mese indicato (YYYY-MM) */
+  receiptQuota: { month: string; used: number }
   alertsEnabled: boolean
 }
 
@@ -65,6 +70,10 @@ interface Actions {
   setSubscription(sub: Subscription): void
   buyPack(pack: PackId): void
   consumeScan(): void
+  /** salva uno scontrino confermato (per il riepilogo della spesa) */
+  saveReceipt(r: Receipt): void
+  /** conta una lettura gratuita nel mese corrente */
+  consumeReceipt(): void
   resetAll(): void
 }
 
@@ -83,6 +92,8 @@ const initial: State = {
   subscription: { plan: 'free' },
   packs: [],
   scansUsed: 0,
+  receipts: [],
+  receiptQuota: { month: '', used: 0 },
   alertsEnabled: false,
 }
 
@@ -204,6 +215,14 @@ export const useApp = create<State & Actions>()(
       buyPack: (pack) => set({ packs: [...new Set([...get().packs, pack])] }),
 
       consumeScan: () => set({ scansUsed: get().scansUsed + 1 }),
+
+      saveReceipt: (r) => set({ receipts: [r, ...get().receipts.filter((x) => x.id !== r.id)].slice(0, 60) }),
+
+      consumeReceipt: () => {
+        const month = monthKey(todayISO())
+        const q = get().receiptQuota
+        set({ receiptQuota: { month, used: (q.month === month ? q.used : 0) + 1 } })
+      },
 
       resetAll: () => set({ ...initial }),
     }),

@@ -3,6 +3,7 @@
  *
  * GET  /config  → { vision: bool, payments: bool }  (l'app usa le funzioni reali solo se configurate)
  * POST /scan    { image: "<base64 jpeg>", mediaType?: "image/jpeg" } → { items: [{ id, confidence }], unknown: [string] }
+ * POST /receipt { image, mediaType? } → { store, total, items: [{ id, price }], unknown: [string] }  (foto di uno scontrino)
  * POST /checkout, /verify, /entitlement, /portal  → vedi stripe.ts
  *
  * Le chiavi restano qui, sul server: l'app non le vede mai.
@@ -62,6 +63,47 @@ const SCHEMA = {
   additionalProperties: false,
 }
 
+const RECEIPT_SYSTEM = `Sei il lettore di scontrini di SvuotaFrigo, un'app italiana anti-spreco.
+Ricevi la foto di uno scontrino della spesa (supermercato, mercato, alimentari). Leggi le righe e collega ogni prodotto alimentare all'id del catalogo qui sotto.
+
+Regole:
+- Le righe degli scontrini sono abbreviate (es. "MOZZ.FIOR.LATTE 125G", "ZUCCH.CHIARE KG"): interpretale come farebbe un cassiere.
+- Usa solo id presenti nel catalogo. Prodotti alimentari senza id vanno in "unknown", in italiano e per esteso.
+- Ignora righe non alimentari (detersivi, sacchetti, igiene), sconti, totali parziali, resto e metodo di pagamento.
+- "price" è il prezzo pagato per quella riga in euro (numero, punto decimale), null se illeggibile. Se lo stesso id compare più volte, una sola voce con la somma.
+- "store" è il nome del negozio se leggibile, altrimenti null. "total" è il totale dello scontrino in euro, null se illeggibile.
+
+Catalogo (id: nomi):
+${CATALOG}`
+
+const RECEIPT_SCHEMA = {
+  type: 'object',
+  properties: {
+    store: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    total: { anyOf: [{ type: 'number' }, { type: 'null' }] },
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', enum: CATALOG_IDS() },
+          price: { anyOf: [{ type: 'number' }, { type: 'null' }] },
+        },
+        required: ['id', 'price'],
+        additionalProperties: false,
+      },
+    },
+    unknown: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['store', 'total', 'items', 'unknown'],
+  additionalProperties: false,
+}
+
+const TASKS = {
+  '/scan': { system: SYSTEM, schema: SCHEMA, ask: 'Quali ingredienti vedi?' },
+  '/receipt': { system: RECEIPT_SYSTEM, schema: RECEIPT_SCHEMA, ask: 'Leggi questo scontrino.' },
+} as const
+
 function CATALOG_IDS() {
   return INGREDIENTS.filter((i) => !i.staple).map((i) => i.id)
 }
@@ -105,7 +147,8 @@ export default {
       }
     }
 
-    if (url.pathname !== '/scan') return json({ error: 'not_found' }, 404, h)
+    const task = url.pathname === '/scan' || url.pathname === '/receipt' ? TASKS[url.pathname] : null
+    if (!task) return json({ error: 'not_found' }, 404, h)
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'vision_not_configured' }, 503, h)
 
     let body: { image?: string; mediaType?: string }
@@ -127,14 +170,14 @@ export default {
         // se il modello declina la richiesta, l'API ripete in automatico su un modello di riserva
         betas: ['server-side-fallback-2026-07-01'],
         fallbacks: 'default',
-        output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
-        system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
+        output_config: { effort: 'low', format: { type: 'json_schema', schema: task.schema } },
+        system: [{ type: 'text', text: task.system, cache_control: { type: 'ephemeral' } }],
         messages: [
           {
             role: 'user',
             content: [
               { type: 'image', source: { type: 'base64', media_type: mediaType, data: body.image } },
-              { type: 'text', text: 'Quali ingredienti vedi?' },
+              { type: 'text', text: task.ask },
             ],
           },
         ],
@@ -145,8 +188,7 @@ export default {
 
       const text = response.content.find((b) => b.type === 'text')
       if (!text || text.type !== 'text') return json({ error: 'empty' }, 502, h)
-      const parsed = JSON.parse(text.text) as { items: { id: string; confidence: string }[]; unknown: string[] }
-      return json(parsed, 200, h)
+      return json(JSON.parse(text.text), 200, h)
     } catch (err) {
       if (err instanceof Anthropic.RateLimitError) return json({ error: 'busy' }, 429, h)
       if (err instanceof Anthropic.BadRequestError) return json({ error: 'bad_request' }, 400, h)

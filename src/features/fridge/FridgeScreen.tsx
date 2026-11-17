@@ -1,5 +1,5 @@
 // Home: il frigo. Prima cosa che vedi: cosa sta per scadere e cosa ci cucini.
-import { Camera, Flame, Plus, Trash2 } from 'lucide-react'
+import { Camera, Flame, Plus, ReceiptText, Trash2 } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { AISLE_LABELS, INGREDIENT_BY_ID } from '@/content/ingredients'
@@ -14,6 +14,7 @@ import { Button, cx, Empty, FreshDot, freshLabel, freshPill, PremiumBadge, Secti
 import { useMatches, usePremium, useToday } from '../hooks'
 import { RecipeCard } from '../recipes/RecipeCard'
 import { AddSheet } from './AddSheet'
+import { ReceiptSheet } from './ReceiptSheet'
 import { ScanSheet } from './ScanSheet'
 
 const STORAGE: { id: Storage; label: string; emoji: string }[] = [
@@ -37,6 +38,7 @@ export function FridgeScreen() {
   const matches = useMatches()
   const [adding, setAdding] = useState(false)
   const [scanning, setScanning] = useState(false)
+  const [reading, setReading] = useState(false)
   const [editing, setEditing] = useState<string | null>(null)
   const [where, setWhere] = useState<Storage>('frigo')
 
@@ -78,6 +80,11 @@ export function FridgeScreen() {
         <button onClick={() => setScanning(true)} className="press card relative flex items-center gap-3 overflow-hidden p-4 text-left">
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-ink text-paper"><Camera size={20} /></span>
           <span><b className="block font-display">Scansiona</b><span className="text-xs text-muted">con una foto</span></span>
+          {!premium && <PremiumBadge className="absolute right-2 top-2 scale-90" />}
+        </button>
+        <button onClick={() => setReading(true)} className="press card relative col-span-2 flex items-center gap-3 overflow-hidden p-4 text-left">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-basil text-white"><ReceiptText size={20} /></span>
+          <span><b className="block font-display">Scontrino furbo</b><span className="text-xs text-muted">fotografa la spesa: entra in dispensa con le scadenze</span></span>
           {!premium && <PremiumBadge className="absolute right-2 top-2 scale-90" />}
         </button>
       </div>
@@ -169,6 +176,7 @@ export function FridgeScreen() {
 
       <AddSheet open={adding} onClose={() => setAdding(false)} />
       <ScanSheet open={scanning} onClose={() => setScanning(false)} />
+      <ReceiptSheet open={reading} onClose={() => setReading(false)} />
       <ItemSheet id={editing} onClose={() => setEditing(null)} />
     </div>
   )

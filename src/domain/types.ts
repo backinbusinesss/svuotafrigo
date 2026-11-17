@@ -125,3 +125,13 @@ export interface MealPlanDay {
   recipeId: string | null
   done: boolean
 }
+
+/** Uno scontrino letto con la fotocamera: cosa hai comprato e quanto hai speso. */
+export interface Receipt {
+  id: string
+  /** data della scansione, YYYY-MM-DD */
+  date: string
+  store: string | null
+  total: number | null
+  items: { id: string; price: number | null }[]
+}

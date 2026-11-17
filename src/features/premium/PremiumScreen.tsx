@@ -1,5 +1,5 @@
 // Paywall: piani, prova gratuita, pacchetti singoli. Prezzi da domain/plans.ts.
-import { BarChart3, Bell, BookOpen, CalendarDays, Camera, Check, Users } from 'lucide-react'
+import { BarChart3, Bell, BookOpen, CalendarDays, Camera, Check, ReceiptText, Users } from 'lucide-react'
 import { useState } from 'react'
 import { PACKS, PLANS, PREMIUM_FEATURES, TRIAL_DAYS, euro } from '@/domain/plans'
 import type { PackId } from '@/domain/types'
@@ -10,7 +10,7 @@ import { useApp } from '@/store/app'
 import { Button, cx, TopBar } from '@/ui/kit'
 import { usePremium } from '../hooks'
 
-const ICONS = { camera: Camera, calendar: CalendarDays, book: BookOpen, bell: Bell, chart: BarChart3, users: Users }
+const ICONS = { camera: Camera, receipt: ReceiptText, calendar: CalendarDays, book: BookOpen, bell: Bell, chart: BarChart3, users: Users }
 
 const HEADLINES: Record<string, string> = {
   scan: 'Scansiona il frigo con una foto.',

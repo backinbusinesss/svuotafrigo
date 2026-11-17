@@ -45,6 +45,7 @@ export const PACKS: Record<PackId, Pack> = {
 /** Cosa sblocca Premium, mostrato nella paywall e nel sito. */
 export const PREMIUM_FEATURES = [
   { icon: 'camera', title: 'Scansiona il frigo', text: 'Una foto e l\'app riconosce gli ingredienti al posto tuo.' },
+  { icon: 'receipt', title: 'Scontrino furbo', text: 'Fotografa lo scontrino: la spesa entra in dispensa con le scadenze e vedi quanto spendi.' },
   { icon: 'calendar', title: 'Piano della settimana', text: 'Sette cene pensate per usare prima ciò che scade, con la lista della spesa pronta.' },
   { icon: 'book', title: 'Tutti i pacchetti di ricette', text: 'Tutti i 12 pacchetti inclusi (mare, mondo, feste, dolci e altri), più quelli che arriveranno.' },
   { icon: 'bell', title: 'Avvisi di scadenza', text: 'Ti avvisiamo prima che qualcosa vada buttato.' },
@@ -56,6 +57,8 @@ export const PREMIUM_FEATURES = [
 export const FREE_LIMITS = {
   /** scansioni foto di prova */
   scans: 1,
+  /** scontrini letti gratis ogni mese */
+  receiptsPerMonth: 1,
   /** porzioni massime nella scalatura */
   servings: 4,
   /** giorni di storico nelle statistiche */

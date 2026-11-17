@@ -52,6 +52,36 @@ export async function scanPhoto(file: File): Promise<ScanResult> {
   return { items: data.items.filter((x) => INGREDIENT_BY_ID[x.id]), unknown: data.unknown ?? [], demo: false }
 }
 
+export interface ReceiptResult {
+  store: string | null
+  total: number | null
+  items: { id: string; price: number | null }[]
+  unknown: string[]
+  demo: boolean
+}
+
+/** Legge uno scontrino: prodotti riconosciuti con il prezzo pagato. */
+export async function scanReceipt(file: File): Promise<ReceiptResult> {
+  const { vision } = await loadApiConfig()
+  if (!vision) {
+    await new Promise((r) => setTimeout(r, 1600))
+    const sample: [string, number][] = [['latte', 1.49], ['uova', 2.39], ['mozzarella', 1.19], ['zucchine', 1.8], ['pomodori', 2.1], ['petto-pollo', 5.9], ['pasta', 0.99], ['yogurt', 1.65]]
+    return { store: 'Supermercato (esempio)', total: 17.51, items: sample.map(([id, price]) => ({ id, price })), unknown: ['carta da forno'], demo: true }
+  }
+  // gli scontrini sono lunghi e stretti: teniamo più risoluzione per leggere le righe
+  const image = await fileToJpegBase64(file, 2000)
+  let data: Omit<ReceiptResult, 'demo'>
+  try {
+    data = await api<Omit<ReceiptResult, 'demo'>>('/receipt', { image, mediaType: 'image/jpeg' })
+  } catch (e) {
+    throw new ScanError(e instanceof ApiError ? e.code : 'network')
+  }
+  const price = (n: unknown) => (typeof n === 'number' && Number.isFinite(n) && n >= 0 && n < 1000 ? Math.round(n * 100) / 100 : null)
+  const seen = new Set<string>()
+  const items = data.items.filter((x) => INGREDIENT_BY_ID[x.id] && !seen.has(x.id) && seen.add(x.id)).map((x) => ({ id: x.id, price: price(x.price) }))
+  return { store: data.store?.slice(0, 60) || null, total: price(data.total), items, unknown: data.unknown ?? [], demo: false }
+}
+
 export const SCAN_ERRORS: Record<string, string> = {
   busy: 'Troppe richieste in questo momento. Riprova tra poco.',
   refused: 'Non siamo riusciti ad analizzare questa foto. Provane un\'altra.',

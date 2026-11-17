@@ -73,7 +73,7 @@ export function PremiumScreen({ from }: { from?: string }) {
         </div>
       </div>
 
-      <ul className="-mt-5 grid gap-2.5">
+      <ul className="relative z-10 -mt-5 grid gap-2.5">
         {PREMIUM_FEATURES.map((f) => {
           const Icon = ICONS[f.icon]
           return (

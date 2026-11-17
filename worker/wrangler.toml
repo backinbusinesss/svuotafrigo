@@ -8,3 +8,12 @@ compatibility_flags = ["nodejs_compat"]
 ALLOWED_ORIGIN = "https://backinbusinesss.github.io,http://localhost:5173"
 
 # La chiave NON va qui: wrangler secret put ANTHROPIC_API_KEY
+
+# Limite sulle foto (frigo e scontrini): 8 richieste al minuto per IP
+[[ratelimits]]
+name = "PHOTO_LIMIT"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 8
+  period = 60

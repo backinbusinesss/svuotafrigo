@@ -14,8 +14,14 @@ import Anthropic from '@anthropic-ai/sdk'
 import { INGREDIENTS } from '../../src/content/ingredients'
 import { handleStripe, StripeError } from './stripe'
 
+interface RateLimit {
+  limit(o: { key: string }): Promise<{ success: boolean }>
+}
+
 interface Env {
   ANTHROPIC_API_KEY?: string
+  /** limite di richieste per IP sulle foto (wrangler.toml → [[ratelimits]]) */
+  PHOTO_LIMIT?: RateLimit
   STRIPE_SECRET_KEY?: string
   /** origini ammesse, separate da virgola (es. "https://backinbusinesss.github.io,https://svuotafrigo.carlarcade.com") */
   ALLOWED_ORIGIN: string
@@ -150,6 +156,14 @@ export default {
     const task = url.pathname === '/scan' || url.pathname === '/receipt' ? TASKS[url.pathname] : null
     if (!task) return json({ error: 'not_found' }, 404, h)
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'vision_not_configured' }, 503, h)
+    // Le foto costano: accettiamo solo chiamate dall'app (Origin ammessa) e al massimo poche al minuto per IP.
+    const origin = req.headers.get('Origin')
+    if (!origin || !origins(env).includes(origin)) return json({ error: 'forbidden' }, 403, h)
+    if (env.PHOTO_LIMIT) {
+      const ip = req.headers.get('CF-Connecting-IP') ?? 'anon'
+      const { success } = await env.PHOTO_LIMIT.limit({ key: ip })
+      if (!success) return json({ error: 'busy' }, 429, h)
+    }
 
     let body: { image?: string; mediaType?: string }
     try {

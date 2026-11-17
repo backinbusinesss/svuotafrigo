@@ -11,6 +11,8 @@ import { PACKS_1 } from './packs-1'
 import { PACKS_2 } from './packs-2'
 import { PACKS_3 } from './packs-3'
 import { PACKS_4 } from './packs-4'
+import { PACKS_5 } from './packs-5'
+import { PACKS_6 } from './packs-6'
 import { FREE_PRIMI } from './recipes-free-primi'
 import { FREE_SECONDI } from './recipes-free-secondi'
 
@@ -296,6 +298,8 @@ export const RECIPES: Recipe[] = [
   ...PACKS_2,
   ...PACKS_3,
   ...PACKS_4,
+  ...PACKS_5,
+  ...PACKS_6,
 ]
 
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((x) => [x.id, x]))

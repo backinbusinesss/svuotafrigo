@@ -1,7 +1,7 @@
 // Controlli sul catalogo: ogni ricetta usa ingredienti esistenti, nessun id duplicato,
 // passi e timer sensati. Si lancia anche da solo con `npm run check-data`.
 import { INGREDIENTS, INGREDIENT_BY_ID } from '@/content/ingredients'
-import { RECIPES } from '@/content/recipes'
+import { RECIPES } from '@/content/all-recipes'
 import { parseIngredients } from '@/content/recipe-dsl'
 import { PACKS } from '@/domain/plans'
 
@@ -86,5 +86,26 @@ describe('varianti', () => {
       expect(INGREDIENT_BY_ID[i.as].as, `${i.id} → ${i.as} è a sua volta una variante`).toBeUndefined()
     }
     for (const r of RECIPES) for (const x of r.ingredients) expect(INGREDIENT_BY_ID[x.id]?.as, `${r.id} usa la variante ${x.id}`).toBeUndefined()
+  })
+})
+
+describe('ricettario a caricamento differito', () => {
+  it('i numeri scritti in counts.ts sono quelli veri', async () => {
+    const { RECIPE_COUNTS } = await import('@/content/counts')
+    expect(RECIPE_COUNTS.total).toBe(RECIPES.length)
+    expect(RECIPE_COUNTS.free).toBe(RECIPES.filter((r) => !r.pack).length)
+  })
+  it('le ricette gratis sono tutte nel pacchetto di base', async () => {
+    const { BASE_RECIPES } = await import('@/content/recipes')
+    const base = new Set(BASE_RECIPES.map((r) => r.id))
+    for (const r of RECIPES) if (!r.pack) expect(base.has(r.id), r.id).toBe(true)
+  })
+  it('scarica le ricette dei pacchetti quando servono', async () => {
+    const catalog = await import('@/content/catalog')
+    const paid = RECIPES.find((r) => r.pack && !catalog.getRecipe(r.id))!
+    expect(paid).toBeDefined()
+    await catalog.loadPackRecipes()
+    expect(catalog.getRecipe(paid.id)?.name).toBe(paid.name)
+    expect(catalog.getRecipes()).toHaveLength(RECIPES.length)
   })
 })

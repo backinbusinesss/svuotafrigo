@@ -4,13 +4,15 @@ import { ArrowRight, BarChart3, Bell, BookOpen, CalendarDays, Camera, Check, Che
 import { motion } from 'motion/react'
 import { type ReactNode, useEffect } from 'react'
 import { INGREDIENT_BY_ID, INGREDIENTS } from '@/content/ingredients'
-import { RECIPE_BY_ID, RECIPES } from '@/content/recipes'
+import { RECIPE_COUNTS } from '@/content/counts'
+import { BASE_RECIPES } from '@/content/recipes'
 import { euro, PACKS, PLANS, TRIAL_DAYS } from '@/domain/plans'
 import type { PackId } from '@/domain/types'
 import { cx, RecipeCover } from '@/ui/kit'
 
 const APP = './app/'
-const FREE_COUNT = RECIPES.filter((r) => !r.pack).length
+const FREE_COUNT = RECIPE_COUNTS.free
+const RECIPE_BY_ID = Object.fromEntries(BASE_RECIPES.map((r) => [r.id, r]))
 
 function useSystemTheme() {
   useEffect(() => {
@@ -85,7 +87,7 @@ function PhoneMock() {
 
 const FEATURES = [
   { Icon: Clock, title: 'Sai cosa scade', text: 'Ogni ingrediente ha la sua scadenza stimata. In cima trovi sempre cosa usare per primo.', tone: 'bg-tomato-soft text-tomato-ink', span: 'md:col-span-2' },
-  { Icon: BookOpen, title: `${RECIPES.length} ricette italiane`, text: 'Dalla carbonara alla ribollita, ordinate per quello che hai già.', tone: 'bg-butter-soft', span: '' },
+  { Icon: BookOpen, title: `${RECIPE_COUNTS.total} ricette italiane`, text: 'Dalla carbonara alla ribollita, ordinate per quello che hai già.', tone: 'bg-butter-soft', span: '' },
   { Icon: ChefHat, title: 'Cucina passo passo', text: 'Testo grande, timer con avviso, schermo sempre acceso.', tone: 'bg-basil-soft text-basil', span: '' },
   { Icon: ShoppingBasket, title: 'Spesa per corsia', text: 'Mancano 2 ingredienti? Un tocco e sono in lista, ordinati come al supermercato.', tone: 'bg-paper-2', span: '' },
   { Icon: WifiOff, title: 'Anche offline', text: 'Si installa come app e funziona senza rete. I tuoi dati restano sul telefono.', tone: 'bg-paper-2', span: '' },
@@ -108,7 +110,7 @@ const FAQ = [
 
 export function Site() {
   useSystemTheme()
-  const marquee = [...RECIPES.filter((r) => !r.pack).slice(0, 14), ...RECIPES.filter((r) => r.pack).slice(0, 6)]
+  const marquee = [...BASE_RECIPES.filter((r) => !r.pack).slice(0, 14), ...BASE_RECIPES.filter((r) => r.pack).slice(0, 6)]
 
   return (
     <div className="overflow-x-hidden">

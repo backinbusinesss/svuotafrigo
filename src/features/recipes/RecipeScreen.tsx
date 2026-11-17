@@ -2,7 +2,7 @@
 import { Check, ChefHat, Clock, Flame, Heart, Lock, Minus, Plus, Share2, ShoppingCart, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { INGREDIENT_BY_ID, recipeIdOf } from '@/content/ingredients'
-import { RECIPE_BY_ID } from '@/content/recipes'
+import { useRecipe } from '@/content/catalog'
 import { formatKg } from '@/domain/impact'
 import { matchRecipe, optionalConflicts, scaleQty } from '@/domain/matching'
 import { FREE_LIMITS, PACKS } from '@/domain/plans'
@@ -26,7 +26,7 @@ function qtyText(ri: RecipeIngredient, base: number, servings: number) {
 }
 
 export function RecipeScreen({ id }: { id: string }) {
-  const recipe = RECIPE_BY_ID[id]
+  const { recipe, pending } = useRecipe(id)
   const pantry = useApp((s) => s.pantry)
   const household = useApp((s) => s.household)
   const diets = useApp((s) => s.diets)
@@ -41,6 +41,7 @@ export function RecipeScreen({ id }: { id: string }) {
   const [done, setDone] = useState<CookedEntry | null>(null)
 
   const m = useMemo(() => recipe && matchRecipe(recipe, pantry, today, access), [recipe, pantry, today, access])
+  if (!recipe && pending) return <div className="pt-20 text-center text-muted">Carico la ricetta…</div>
   if (!recipe || !m) {
     return <div className="pt-20 text-center"><p>Ricetta non trovata.</p><a className="text-tomato" href={href({ name: 'ricette' })}>Torna alle ricette</a></div>
   }

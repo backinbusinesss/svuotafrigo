@@ -1,4 +1,4 @@
-import { RECIPE_BY_ID, RECIPES } from '@/content/recipes'
+import { RECIPE_BY_ID, RECIPES } from '@/content/all-recipes'
 import { addDays, daysBetween, relativeDays } from '@/domain/dates'
 import { badges, rescueValue, streak, totals } from '@/domain/impact'
 import { fitsProfile, matchAll, matchRecipe, scaleQty } from '@/domain/matching'

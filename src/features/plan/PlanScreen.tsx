@@ -2,7 +2,7 @@
 import { CalendarDays, Check, RefreshCw, ShoppingCart, Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import { INGREDIENT_BY_ID } from '@/content/ingredients'
-import { RECIPE_BY_ID, RECIPES } from '@/content/recipes'
+import { getRecipe, useRecipes } from '@/content/catalog'
 import { dayMonth, todayISO, weekdayLong } from '@/domain/dates'
 import { planWeek } from '@/domain/planner'
 import { buzz, toast } from '@/lib/feedback'
@@ -22,16 +22,17 @@ export function PlanScreen() {
   const cooked = useApp((s) => s.cooked)
   const setMealPlan = useApp((s) => s.setMealPlan)
   const markPlanDone = useApp((s) => s.markPlanDone)
+  const recipes = useRecipes(true)
 
   // Anteprima calcolata davvero sul frigo dell'utente: è la promessa concreta del Premium.
   const preview = useMemo(
-    () => planWeek({ recipes: RECIPES, pantry, profile: { diets, allergies }, access: { premium: true, packs: [] }, start: today }),
-    [pantry, diets, allergies, today],
+    () => planWeek({ recipes, pantry, profile: { diets, allergies }, access: { premium: true, packs: [] }, start: today }),
+    [recipes, pantry, diets, allergies, today],
   )
 
   const generate = () => {
     const recent = cooked.slice(0, 10).map((c) => c.recipeId)
-    const res = planWeek({ recipes: RECIPES, pantry, profile: { diets, allergies }, access, start: todayISO(), avoid: recent })
+    const res = planWeek({ recipes, pantry, profile: { diets, allergies }, access, start: todayISO(), avoid: recent })
     setMealPlan(res.days, res.shopping)
     buzz([10, 30, 10])
     toast(`Piano pronto: ${res.rescued.length} ingredienti salvati, ${res.shopping.length} da comprare`, '📅')
@@ -47,7 +48,7 @@ export function PlanScreen() {
         <div className="relative mt-5">
           <div className="pointer-events-none grid select-none gap-2 blur-[3px]" aria-hidden>
             {preview.days.slice(0, 5).map((d) => {
-              const r = RECIPE_BY_ID[d.recipeId!]
+              const r = getRecipe(d.recipeId!)!
               return (
                 <div key={d.date} className="card flex items-center gap-3 p-2.5">
                   <RecipeCover recipe={r} size="sm" className="h-14 w-14 rounded-xl" />
@@ -88,7 +89,7 @@ export function PlanScreen() {
         <>
           <div className="mt-5 grid gap-2.5">
             {current.map((d) => {
-              const r = d.recipeId ? RECIPE_BY_ID[d.recipeId] : null
+              const r = d.recipeId ? getRecipe(d.recipeId) : null
               if (!r) return null
               const isToday = d.date === today
               return (

@@ -3,7 +3,7 @@ import { Check, PackageCheck, Plus, Share2, Trash2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { AISLE_LABELS, INGREDIENT_BY_ID } from '@/content/ingredients'
-import { RECIPE_BY_ID } from '@/content/recipes'
+import { getRecipe, useRecipes } from '@/content/catalog'
 import { groupByAisle } from '@/domain/planner'
 import type { Aisle } from '@/domain/types'
 import { buzz, toast } from '@/lib/feedback'
@@ -15,6 +15,8 @@ const ORDER = Object.keys(AISLE_LABELS) as Aisle[]
 
 export function ShoppingScreen() {
   const list = useApp((s) => s.shopping)
+  // i nomi delle ricette dei pacchetti arrivano col loro chunk
+  useRecipes(list.some((s) => s.forRecipes.some((id) => !getRecipe(id))))
   const toggle = useApp((s) => s.toggleShopping)
   const remove = useApp((s) => s.removeShopping)
   const moveChecked = useApp((s) => s.moveCheckedToPantry)
@@ -69,7 +71,7 @@ export function ShoppingScreen() {
                         <span className="text-2xl">{ing.emoji}</span>
                         <span className="min-w-0 flex-1">
                           <span className={cx('block font-medium', s.checked && 'text-faint line-through')}>{ing.name}</span>
-                          {s.forRecipes.length > 0 && <span className="block truncate text-xs text-muted">per {s.forRecipes.map((id) => RECIPE_BY_ID[id]?.name).filter(Boolean).join(', ')}</span>}
+                          {s.forRecipes.length > 0 && <span className="block truncate text-xs text-muted">per {s.forRecipes.map((id) => getRecipe(id)?.name).filter(Boolean).join(', ')}</span>}
                         </span>
                         <button onClick={() => remove(s.ingredientId)} aria-label="Elimina" className="press grid h-8 w-8 place-items-center rounded-full text-faint hover:bg-paper-2"><X size={16} /></button>
                       </motion.li>

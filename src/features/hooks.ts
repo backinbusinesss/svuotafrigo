@@ -1,7 +1,7 @@
 // Dati derivati dallo store, calcolati una volta per render.
 import { useMemo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import { RECIPES } from '@/content/recipes'
+import { useRecipes } from '@/content/catalog'
 import { todayISO } from '@/domain/dates'
 import { matchAll } from '@/domain/matching'
 import { accessOf, isPremium, useApp } from '@/store/app'
@@ -19,8 +19,10 @@ export function useMatches(includeLocked = false) {
   const { pantry, diets, allergies } = useApp(useShallow((s) => ({ pantry: s.pantry, diets: s.diets, allergies: s.allergies })))
   const access = useAccess()
   const today = useToday()
+  // le ricette dei pacchetti si scaricano solo se l'utente le può usare o le vuole vedere
+  const recipes = useRecipes(includeLocked || access.premium || access.packs.length > 0)
   return useMemo(
-    () => matchAll(RECIPES, pantry, { profile: { diets, allergies }, access, today, includeLocked }),
-    [pantry, diets, allergies, access, today, includeLocked],
+    () => matchAll(recipes, pantry, { profile: { diets, allergies }, access, today, includeLocked }),
+    [recipes, pantry, diets, allergies, access, today, includeLocked],
   )
 }

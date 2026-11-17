@@ -2,7 +2,7 @@
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
-import { RECIPE_BY_ID } from '@/content/recipes'
+import { useRecipe } from '@/content/catalog'
 import { buzz, ding, toast } from '@/lib/feedback'
 import { back, go } from '@/lib/router'
 import { useApp } from '@/store/app'
@@ -65,7 +65,7 @@ function Timer({ minutes }: { minutes: number }) {
 }
 
 export function CookMode({ id }: { id: string }) {
-  const recipe = RECIPE_BY_ID[id]
+  const { recipe } = useRecipe(id)
   const cook = useApp((s) => s.cook)
   const [i, setI] = useState(0)
   const [dir, setDir] = useState(1)

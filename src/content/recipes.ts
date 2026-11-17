@@ -1,5 +1,7 @@
 // Il ricettario. Porzioni base: 2 persone, salvo dove indicato.
 // Le ricette con "pack" sono a pagamento (Premium o pacchetto singolo).
+// Qui ci sono le ricette gratis (più le prime dei pacchetti): stanno nel pacchetto JS principale.
+// Le altre ricette dei pacchetti sono in pack-recipes.ts e si scaricano solo quando servono (vedi catalog.ts).
 import type { Recipe } from '@/domain/types'
 import { r } from './recipe-dsl'
 import { DOLCI_EXTRA } from './recipes-dolci'
@@ -7,16 +9,10 @@ import { PRIMI_EXTRA } from './recipes-primi'
 import { SECONDI_EXTRA } from './recipes-secondi'
 import { FREE_ALTRO } from './recipes-free-altro'
 import { FREE_EXTRA } from './recipes-free-extra'
-import { PACKS_1 } from './packs-1'
-import { PACKS_2 } from './packs-2'
-import { PACKS_3 } from './packs-3'
-import { PACKS_4 } from './packs-4'
-import { PACKS_5 } from './packs-5'
-import { PACKS_6 } from './packs-6'
 import { FREE_PRIMI } from './recipes-free-primi'
 import { FREE_SECONDI } from './recipes-free-secondi'
 
-export const RECIPES: Recipe[] = [
+export const BASE_RECIPES: Recipe[] = [
   // ════════════ PRIMI ════════════
   r({ id: 'carbonara', name: 'Spaghetti alla carbonara', hook: 'Cinque ingredienti, zero panna.', course: 'primo', min: 20, diff: 2, kcal: 650, emoji: '🍝🥓🥚', region: 'Lazio',
     ing: 'pasta 200g, uova 3pz, pancetta 100g, pecorino 50g, pepe, sale',
@@ -294,12 +290,5 @@ export const RECIPES: Recipe[] = [
   ...FREE_SECONDI,
   ...FREE_ALTRO,
   ...FREE_EXTRA,
-  ...PACKS_1,
-  ...PACKS_2,
-  ...PACKS_3,
-  ...PACKS_4,
-  ...PACKS_5,
-  ...PACKS_6,
 ]
 
-export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((x) => [x.id, x]))

@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { INGREDIENT_BY_ID, recipeIdOf } from '@/content/ingredients'
-import { RECIPE_BY_ID } from '@/content/recipes'
+import { getRecipe } from '@/content/catalog'
 import { addDays, todayISO, toISODate } from '@/domain/dates'
 import { rescueValue } from '@/domain/impact'
 import type { Access } from '@/domain/matching'
@@ -163,7 +163,8 @@ export const useApp = create<State & Actions>()(
       clearShopping: () => set({ shopping: [] }),
 
       cook: (recipeId) => {
-        const recipe = RECIPE_BY_ID[recipeId]
+        const recipe = getRecipe(recipeId)
+        if (!recipe) throw new Error(`Ricetta ${recipeId} non caricata`)
         const today = todayISO()
         // Escono dal frigo solo i freschi deperibili (zucchine, latte, carne…) e ciò che
         // scadeva a breve. Uova, formaggi stagionati, pasta, cipolle di solito avanzano.
